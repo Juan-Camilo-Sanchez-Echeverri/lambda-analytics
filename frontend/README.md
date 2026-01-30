@@ -1,73 +1,61 @@
-# React + TypeScript + Vite
+# Lambda Analytics — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend desarrollado con React + TypeScript + Vite.
 
-Currently, two official plugins are available:
+**Resumen rápido:** la app usa Vite para desarrollo y build, y `axios` con `VITE_API_BASE_URL` para la URL del backend.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**Requisitos**
 
-## React Compiler
+- Node.js >= 18
+- npm, yarn o pnpm
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+**Instalación**
 
-## Expanding the ESLint configuration
+1. Abrir una terminal en la carpeta del frontend:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cd frontend
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Instalar dependencias:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+# o usando pnpm
+pnpm install
+# o usando yarn
+yarn
 ```
+
+**Configuración de entorno**
+La aplicación espera la variable de entorno `VITE_API_BASE_URL` (accesible en el código como `import.meta.env.VITE_API_BASE_URL`).
+
+Crear un archivo `.env.local` (o `.env`) en la carpeta `frontend/` con, por ejemplo:
+
+```env
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+Sustituye la URL por la del backend si está en otra máquina o puerto.
+
+**Scripts útiles**
+
+- `npm run dev` — inicia el servidor de desarrollo (Vite). Por defecto sirve en `http://localhost:5173`.
+- `npm run build` — compila TypeScript y genera la build de producción en `dist`.
+
+Ejemplos:
+
+```bash
+# Desarrollo
+cd frontend
+npm run dev
+
+# Build para producción
+npm run build
+
+```
+
+**Notas sobre el backend**
+
+- El backend por defecto en este repositorio usa el puerto `3000`. Si ejecutas el backend localmente en `http://localhost:3000`, la variable `VITE_API_BASE_URL` del ejemplo funcionará sin cambios.
+- Arranca primero el backend para que la app frontend pueda comunicarse con él.
