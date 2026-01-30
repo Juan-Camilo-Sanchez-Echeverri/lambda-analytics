@@ -18,7 +18,7 @@ import { envs, setupSwagger } from '@configs';
 
 import { getClassValidatorErrors } from '@common/helpers';
 
-const logger = new ConsoleLogger({ prefix: 'Erotic Site' });
+const logger = new ConsoleLogger({ prefix: 'Lambda Analytics' });
 
 async function bootstrap(): Promise<void> {
   /**
