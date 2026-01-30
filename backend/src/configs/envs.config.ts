@@ -17,6 +17,12 @@ config({ path: envPath });
 interface EnvVars {
   PORT: number;
   NODE_ENV: ExecModes;
+
+  DB_HOST: string;
+  DB_PORT: number;
+  DB_NAME: string;
+  DB_USERNAME: string;
+  DB_PASSWORD: string;
 }
 
 const envSchema = joi
@@ -26,6 +32,11 @@ const envSchema = joi
       .string()
       .valid(...Object.values(ExecModes))
       .default(ExecModes.LOCAL),
+    DB_HOST: joi.string().required(),
+    DB_PORT: joi.number().required(),
+    DB_NAME: joi.string().required(),
+    DB_USERNAME: joi.string().required(),
+    DB_PASSWORD: joi.string().required(),
   })
   .unknown(true);
 
@@ -46,4 +57,10 @@ const envVars: EnvVars = value;
 export const envs = {
   port: envVars.PORT,
   nodeEnv,
+
+  dbHost: envVars.DB_HOST,
+  dbPort: envVars.DB_PORT,
+  dbName: envVars.DB_NAME,
+  dbUsername: envVars.DB_USERNAME,
+  dbPassword: envVars.DB_PASSWORD,
 };
