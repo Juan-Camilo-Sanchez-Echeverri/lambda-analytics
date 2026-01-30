@@ -17,7 +17,6 @@ const swaggerConfig = new DocumentBuilder()
       type: 'object',
       properties: {
         error: { type: 'string' },
-        code: { type: 'null' },
         status: { type: 'number' },
         path: { type: 'string' },
         details: {
@@ -37,9 +36,8 @@ const swaggerConfig = new DocumentBuilder()
     },
     example: {
       error: '',
-      code: null,
       status: 500,
-      path: '/api/v1.0/users',
+      path: '/api/v1.0/projects',
       details: [
         {
           property: null,
