@@ -1,6 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 
-import { ConsoleLogger, VersioningType } from '@nestjs/common';
+import {
+  ConsoleLogger,
+  UnprocessableEntityException,
+  ValidationPipe,
+  VersioningType,
+} from '@nestjs/common';
 
 import { NestExpressApplication } from '@nestjs/platform-express';
 
@@ -10,6 +15,8 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 import { envs } from '@configs';
+
+import { getClassValidatorErrors } from '@common/helpers';
 
 const logger = new ConsoleLogger({ prefix: 'Erotic Site' });
 
@@ -32,6 +39,23 @@ async function bootstrap(): Promise<void> {
    */
   app.set('trust proxy', true);
   app.set('query parser', 'extended');
+
+  /**
+   * Use global pipes.
+   */
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      exceptionFactory: (validationErrors): UnprocessableEntityException => {
+        const message = 'Validation failed';
+        const details = getClassValidatorErrors(validationErrors);
+
+        return new UnprocessableEntityException({ message, details });
+      },
+    }),
+  );
 
   /**
    * Set the global prefix.
