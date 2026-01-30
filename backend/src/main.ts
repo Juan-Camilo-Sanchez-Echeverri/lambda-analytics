@@ -41,6 +41,14 @@ async function bootstrap(): Promise<void> {
   app.set('query parser', 'extended');
 
   /**
+   * Enable CORS with the specified configuration.
+   */
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  });
+
+  /**
    * Use global pipes.
    */
   app.useGlobalPipes(
