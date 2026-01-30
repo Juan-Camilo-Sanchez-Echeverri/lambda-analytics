@@ -4,7 +4,20 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { PostgresConfigService } from '@configs';
 
+import { ProjectsModule } from '@modules/projects/projects.module';
+import { ActivitiesModule } from '@modules/activities/activities.module';
+import { IndicatorsModule } from '@modules/indicators/indicators.module';
+import { ReportsModule } from '@modules/reports/reports.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
+
 @Module({
-  imports: [TypeOrmModule.forRootAsync({ useClass: PostgresConfigService })],
+  imports: [
+    TypeOrmModule.forRootAsync({ useClass: PostgresConfigService }),
+    ProjectsModule,
+    ActivitiesModule,
+    IndicatorsModule,
+    ReportsModule,
+    DashboardModule,
+  ],
 })
 export class AppModule {}
