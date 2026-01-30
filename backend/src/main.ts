@@ -9,7 +9,9 @@ import helmet from 'helmet';
 
 import { AppModule } from './app.module';
 
-const logger = new ConsoleLogger({ prefix: 'Analytics Backend' });
+import { envs } from '@configs';
+
+const logger = new ConsoleLogger({ prefix: 'Erotic Site' });
 
 async function bootstrap(): Promise<void> {
   /**
@@ -42,8 +44,8 @@ async function bootstrap(): Promise<void> {
     defaultVersion: '1.0',
   });
 
-  await app.listen(3000);
-  logger.log(`Server running on ${3000}`);
+  await app.listen(envs.port);
+  logger.log(`Server running on ${envs.port} 🚀 in ${envs.nodeEnv}`);
 }
 
 bootstrap().catch((err) => {
