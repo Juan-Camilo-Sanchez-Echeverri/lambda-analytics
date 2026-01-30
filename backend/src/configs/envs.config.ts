@@ -23,6 +23,13 @@ interface EnvVars {
   DB_NAME: string;
   DB_USERNAME: string;
   DB_PASSWORD: string;
+
+  DEFAULT_USER_NAME: string;
+  DEFAULT_USER_EMAIL: string;
+  DEFAULT_USER_PASSWORD: string;
+
+  JWT_SECRET: string;
+  JWT_EXPIRATION: string;
 }
 
 const envSchema = joi
@@ -37,6 +44,13 @@ const envSchema = joi
     DB_NAME: joi.string().required(),
     DB_USERNAME: joi.string().required(),
     DB_PASSWORD: joi.string().required(),
+
+    DEFAULT_USER_NAME: joi.string().required(),
+    DEFAULT_USER_EMAIL: joi.string().required(),
+    DEFAULT_USER_PASSWORD: joi.string().required(),
+
+    JWT_SECRET: joi.string().required(),
+    JWT_EXPIRATION: joi.string().required(),
   })
   .unknown(true);
 
@@ -63,4 +77,11 @@ export const envs = {
   dbName: envVars.DB_NAME,
   dbUsername: envVars.DB_USERNAME,
   dbPassword: envVars.DB_PASSWORD,
+
+  defaultUserName: envVars.DEFAULT_USER_NAME,
+  defaultUserEmail: envVars.DEFAULT_USER_EMAIL,
+  defaultUserPassword: envVars.DEFAULT_USER_PASSWORD,
+
+  jwtSecret: envVars.JWT_SECRET,
+  jwtExpiration: envVars.JWT_EXPIRATION,
 };

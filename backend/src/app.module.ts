@@ -8,7 +8,9 @@ import { ProjectsModule } from '@modules/projects/projects.module';
 import { ActivitiesModule } from '@modules/activities/activities.module';
 import { IndicatorsModule } from '@modules/indicators/indicators.module';
 import { ReportsModule } from '@modules/reports/reports.module';
-import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { DashboardModule } from '@modules/dashboard/dashboard.module';
+import { UsersModule } from '@modules/users/users.module';
+import { AuthModule } from '@modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     IndicatorsModule,
     ReportsModule,
     DashboardModule,
+    UsersModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
