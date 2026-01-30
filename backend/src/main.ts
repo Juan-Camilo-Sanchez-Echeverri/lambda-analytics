@@ -14,7 +14,7 @@ import helmet from 'helmet';
 
 import { AppModule } from './app.module';
 
-import { envs } from '@configs';
+import { envs, setupSwagger } from '@configs';
 
 import { getClassValidatorErrors } from '@common/helpers';
 
@@ -68,8 +68,14 @@ async function bootstrap(): Promise<void> {
     defaultVersion: '1.0',
   });
 
+  /**
+   * Create the swagger document and setup the swagger module.
+   */
+  setupSwagger(app);
+
   await app.listen(envs.port);
   logger.log(`Server running on ${envs.port} 🚀 in ${envs.nodeEnv}`);
+  logger.log(`API documentation available at /docs 📚`);
 }
 
 bootstrap().catch((err) => {
