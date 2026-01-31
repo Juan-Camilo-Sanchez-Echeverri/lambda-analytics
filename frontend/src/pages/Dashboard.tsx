@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { useProjects } from '../hooks/useProjects';
 import type { ProjectStatus, SortKey } from '../hooks/types';
@@ -29,46 +29,21 @@ export default function Dashboard() {
     params.status ?? 'all',
   );
 
-  const fallbackActive = useMemo(
-    () => projects.filter((p) => p.status === 'ACTIVE').length,
-    [projects],
-  );
+  const chartData = summary
+    ? summary.top5ByPerformance.map((b) => ({
+        name: b.name,
+        performance: b.performance,
+        progress:
+          summary.progressByProject.find((p) => p.id === b.id)?.progress ?? 0,
+      }))
+    : [];
 
-  const fallbackAvgProgress = useMemo(() => {
-    const progressProjects = projects.map((p) => p.progress);
+  const avgTop5Performance = summary?.top5ByPerformance.length
+    ? summary.top5ByPerformance.reduce((sum, t) => sum + t.performance, 0) /
+      summary.top5ByPerformance.length
+    : 0;
 
-    return progressProjects.length ? progressProjects.reduce((a, b) => a + b, 0) / progressProjects.length : 0;
-
-  }, [projects]);
-
-  const chartData = useMemo(() => {
-    if (!summary) {
-
-      const dataBase = [...projects]
-        .sort((a, b) => (b.performance ?? 0) - (a.performance ?? 0))
-        .slice(0, 5);
-
-      return dataBase.map((p) => ({
-        name: p.name,
-        progress: p.progress,
-        performance: p.performance,
-      }));
-    }
-
-    const progressMap = new Map(
-      summary.progressByProject.map((p) => [p.id, p.progress]),
-    );
-
-    return summary.top5ByPerformance.map((b) => ({
-      name: b.name,
-      performance: b.performance ?? 0,
-      progress: progressMap.get(b.id) ?? 0,
-    }));
-
-  }, [summary, projects]);
-
-  const onApplyFilters = (e: React.FormEvent) => {
-    e.preventDefault();
+  const onApplyFilters = () => {
     filterBy(localQ, localStatus);
   };
 
@@ -87,7 +62,7 @@ export default function Dashboard() {
 
       <section className="mb-6">
         <form
-          onSubmit={onApplyFilters}
+          action={onApplyFilters}
           className="flex flex-col md:flex-row gap-2 md:items-end"
         >
           <div className="flex-1">
@@ -161,11 +136,11 @@ export default function Dashboard() {
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         <KpiCard
           label="Proyectos activos"
-          value={summary?.totalActiveProjects ?? fallbackActive}
+          value={summary?.totalActiveProjects ?? 0}
         />
         <KpiCard
           label="Promedio de progreso global"
-          value={summary?.globalProgressAvg ?? fallbackAvgProgress}
+          value={summary?.globalProgressAvg ?? 0}
           format={formatPercent}
         />
         <KpiCard
@@ -174,11 +149,7 @@ export default function Dashboard() {
         />
         <KpiCard
           label="Promedio de desempeño top-5"
-          value={(() => {
-            const arr =
-              summary?.top5ByPerformance.map((t) => t.performance) ?? [];
-            return arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
-          })()}
+          value={avgTop5Performance}
           format={formatPercent}
         />
       </section>
