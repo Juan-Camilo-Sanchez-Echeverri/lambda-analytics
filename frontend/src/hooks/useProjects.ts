@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { api } from '../services/api';
 
@@ -13,115 +13,122 @@ import type {
   Summary,
 } from './types';
 
-interface UseProjectsReturn {
+type Params = {
+  q: string;
+  status: ProjectStatus | 'all';
+  sort: SortKey;
+  order: Order;
+  page: number;
+  limit: number;
+};
+
+type UseProjectsReturn = {
   projects: Project[];
   summary: Summary | null;
   meta: PaginationMeta;
   loading: boolean;
   error: unknown;
+  params: Params;
   refetch: () => Promise<void>;
   filterBy: (q: string, status?: ProjectStatus | 'all') => void;
-  sortBy: (sort: SortKey) => void;
-  goToPage: (p: number) => void;
-  setLimit: (n: number) => void;
-  params: Omit<Required<ProjectQuery>, 'status'> & {
-    status: ProjectStatus | 'all';
+  sortBy: (key: SortKey) => void;
+  goToPage: (page: number) => void;
+  setLimit: (limit: number) => void;
+};
+
+const DEFAULT_META: PaginationMeta = {
+  page: 1,
+  limit: 10,
+  total: 0,
+  pages: 1,
+};
+
+function parseListResponse(payload: ApiListResponse<Project>): {
+  data: Project[];
+  meta: PaginationMeta;
+} {
+  const data: Project[] = Array.isArray(payload?.data) ? payload.data : [];
+  const metaRaw = payload?.meta ?? {};
+
+  return {
+    data,
+    meta: {
+      page: metaRaw.page,
+      limit: metaRaw.limit,
+      total: metaRaw.total,
+      pages: metaRaw.pages,
+    },
   };
 }
 
 export function useProjects(
-  initial: Partial<ProjectQuery & { status?: ProjectStatus | 'all' }> = {},
+  initialParams: Partial<
+    ProjectQuery & { status?: ProjectStatus | 'all' }
+  > = {},
 ): UseProjectsReturn {
   const [projects, setProjects] = useState<Project[]>([]);
   const [summary, setSummary] = useState<Summary | null>(null);
-  const [meta, setMeta] = useState<PaginationMeta>({
-    page: 1,
-    limit: 10,
-    total: 0,
-    pages: 1,
-  });
+  const [meta, setMeta] = useState<PaginationMeta>(DEFAULT_META);
 
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
 
-  const [q, setQ] = useState<string>(initial.q ?? '');
+  const [q, setQ] = useState(initialParams.q ?? '');
   const [status, setStatus] = useState<ProjectStatus | 'all'>(
-    initial.status ?? 'all',
+    initialParams.status ?? 'all',
   );
 
-  const [sort, setSort] = useState<SortKey>(initial.sort ?? 'updatedAt');
-  const [order, setOrder] = useState<Order>(initial.order ?? 'DESC');
-  const [page, setPage] = useState<number>(initial.page ?? 1);
-  const [limit, setLimitState] = useState<number>(initial.limit ?? 10);
+  const [sort, setSort] = useState<SortKey>(initialParams.sort ?? 'updatedAt');
+  const [order, setOrder] = useState<Order>(initialParams.order ?? 'DESC');
+  const [page, setPage] = useState(initialParams.page ?? 1);
+  const [limit, setLimitState] = useState(initialParams.limit ?? 10);
 
-  const abortRef = useRef<AbortController | null>(null);
-
-  const params = useMemo(
-    () => ({ q, status, sort, order, page, limit }),
-    [q, status, sort, order, page, limit],
-  );
-
-  const parseList = useCallback(
-    (payload: ApiListResponse<Project>) => {
-      const data: Project[] = Array.isArray(payload?.data) ? payload.data : [];
-      const metaRaw = payload?.meta ?? {};
-
-      const meta: PaginationMeta = {
-        page: metaRaw.page ?? page,
-        limit: metaRaw.limit ?? limit,
-        total: metaRaw.total ?? data.length,
-        pages: metaRaw.pages,
-      };
-
-      return { data, meta };
-    },
-    [page, limit],
-  );
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const fetchSummary = useCallback(async (signal: AbortSignal) => {
     const { data } = await api.get<Summary>('/dashboard/summary', { signal });
 
-    const summary = {
+    setSummary({
       totalActiveProjects: data.totalActiveProjects ?? 0,
       globalProgressAvg: data.globalProgressAvg ?? 0,
-      progressByProject: data.progressByProject,
-      top5ByPerformance: data.top5ByPerformance,
-      criticalIndicators: data.criticalIndicators,
-    };
-
-    setSummary(summary);
+      progressByProject: data.progressByProject ?? [],
+      top5ByPerformance: data.top5ByPerformance ?? [],
+      criticalIndicators: data.criticalIndicators ?? [],
+    });
   }, []);
 
   const fetchProjects = useCallback(
     async (signal: AbortSignal) => {
       const { data } = await api.get<ApiListResponse<Project>>('/projects', {
         params: {
-          q: params.q || undefined,
-          status: params.status === 'all' ? undefined : params.status,
-          sort: params.sort || undefined,
-          order: params.order || undefined,
-          page: params.page,
-          limit: params.limit,
+          q: q || undefined,
+          status: status === 'all' ? undefined : status,
+          sort,
+          order,
+          page,
+          limit,
         },
         signal,
       });
 
-      const parsed = parseList(data);
-      setProjects(parsed.data);
-      setMeta(parsed.meta);
+      const dataParsed = parseListResponse(data);
+      setProjects(dataParsed.data);
+      setMeta(dataParsed.meta);
     },
-    [params],
+    [q, status, sort, order, page, limit],
   );
 
   const refetch = useCallback(async () => {
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = new AbortController();
+    const { signal } = abortControllerRef.current;
+
     setLoading(true);
     setError(null);
+
     try {
-      abortRef.current?.abort();
-      abortRef.current = new AbortController();
-      const { signal } = abortRef.current;
       await Promise.allSettled([fetchSummary(signal), fetchProjects(signal)]);
-    } catch (err: unknown) {
+    } catch (err) {
       setError(err);
     } finally {
       setLoading(false);
@@ -130,24 +137,24 @@ export function useProjects(
 
   useEffect(() => {
     void refetch();
-    return () => abortRef.current?.abort();
+    return () => abortControllerRef.current?.abort();
   }, [refetch]);
 
   const filterBy = useCallback(
-    (query: string, nextStatus?: ProjectStatus | 'all') => {
+    (query: string, newStatus?: ProjectStatus | 'all') => {
       setQ(query);
-      if (nextStatus !== undefined) setStatus(nextStatus);
-      setPage(1);
+      if (newStatus !== undefined) setStatus(newStatus);
+      setPage(1); // Volver a la primera página
     },
     [],
   );
 
   const sortBy = useCallback(
-    (nextSort: SortKey) => {
-      if (nextSort === sort) {
+    (column: SortKey) => {
+      if (column === sort) {
         setOrder((prev) => (prev === 'ASC' ? 'DESC' : 'ASC'));
       } else {
-        setSort(nextSort);
+        setSort(column);
         setOrder('ASC');
       }
       setPage(1);
@@ -155,9 +162,12 @@ export function useProjects(
     [sort],
   );
 
-  const goToPage = useCallback((p: number) => setPage(p), []);
-  const setLimit = useCallback((n: number) => {
-    setLimitState(n);
+  const goToPage = useCallback((newPage: number) => {
+    setPage(newPage);
+  }, []);
+
+  const setLimit = useCallback((newLimit: number) => {
+    setLimitState(newLimit);
     setPage(1);
   }, []);
 
