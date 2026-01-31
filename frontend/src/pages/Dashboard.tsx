@@ -162,7 +162,6 @@ export default function Dashboard() {
         <KpiCard
           label="Proyectos activos"
           value={summary?.totalActiveProjects ?? fallbackActive}
-          variant="success"
         />
         <KpiCard
           label="Promedio de progreso global"
@@ -172,9 +171,6 @@ export default function Dashboard() {
         <KpiCard
           label="Indicadores críticos"
           value={summary?.criticalIndicators.length ?? 0}
-          variant={
-            (summary?.criticalIndicators.length ?? 0) > 0 ? 'danger' : 'default'
-          }
         />
         <KpiCard
           label="Promedio de desempeño top-5"

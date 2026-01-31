@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 
-import clsx from 'clsx';
 
 import type { Order, PaginationMeta, Project, SortKey } from '../hooks/types';
 
@@ -66,10 +65,7 @@ export function ProjectsTable({
               <th
                 key={h.key}
                 scope="col"
-                className={clsx(
-                  'px-4 py-2 text-left text-sm font-medium text-gray-700',
-                  'cursor-pointer select-none',
-                )}
+                className="px-4 py-2 text-left text-sm font-medium text-gray-700 cursor-pointer select-none"
                 onClick={() => onSort(h.key)}
               >
                 <span className="inline-flex items-center">
@@ -101,13 +97,11 @@ export function ProjectsTable({
                   <td className="px-4 py-2 text-sm">{p.name}</td>
                   <td className="px-4 py-2">
                     <span
-                      className={clsx(
-                        'px-2 py-1 text-xs rounded-full',
-                        p.status === 'ACTIVE' && 'bg-green-100 text-green-700',
-                        p.status === 'INACTIVE' && 'bg-yellow-100 text-yellow-700'
-                      )}
-                    >
-                      {p.status === 'ACTIVE' ? 'ACTIVO' : 'INACTIVO'}
+                      className={`px-2 py-1 text-xs rounded-full ${
+                        p.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                      }`}
+                    > 
+                      {p.status === 'ACTIVE' ? 'ACTIVO' : 'INACTIVO'} 
                     </span>
                   </td>
                   <td className="px-4 py-2">
