@@ -105,20 +105,24 @@ export class ProjectsService {
 
   async getPerProjectProgress(): Promise<PerProjectProgressRow[]> {
     return this.projectsRepository
-      .createQueryBuilder('p')
-      .select(['p.id AS id', 'p.name AS name', 'p.progress::float AS progress'])
+      .createQueryBuilder('project')
+      .select([
+        'project.id AS id',
+        'project.name AS name',
+        'project.progress::float AS progress',
+      ])
       .getRawMany<PerProjectProgressRow>();
   }
 
   async getTopByPerformance(limit = 5): Promise<TopPerformanceRow[]> {
     return this.projectsRepository
-      .createQueryBuilder('p')
+      .createQueryBuilder('project')
       .select([
-        'p.id AS id',
-        'p.name AS name',
-        'p.performance::float AS performance',
+        'project.id AS id',
+        'project.name AS name',
+        'project.performance::float AS performance',
       ])
-      .orderBy('p.performance', 'DESC')
+      .orderBy('project.performance', 'DESC')
       .limit(limit)
       .getRawMany<TopPerformanceRow>();
   }

@@ -61,16 +61,16 @@ export class IndicatorsService {
     const nameWhere = q ? { name: ILike(`%${q}%`) } : {};
 
     let qb = this.indicatorRepository
-      .createQueryBuilder('i')
-      .leftJoinAndSelect('i.project', 'p')
+      .createQueryBuilder('indicator')
+      .leftJoinAndSelect('indicator.project', 'project')
       .where({ ...where, ...nameWhere });
 
     if (criticalOnly === 'true') {
-      qb = qb.andWhere('i.currentValue < i.threshold');
+      qb = qb.andWhere('indicator.currentValue < indicator.threshold');
     }
 
     qb = qb
-      .orderBy(`i.${sort}`, order)
+      .orderBy(`indicator.${sort}`, order)
       .skip((page - 1) * limit)
       .take(limit);
 
@@ -138,18 +138,18 @@ export class IndicatorsService {
 
   async getCriticalIndicators(): Promise<CriticalIndicatorRow[]> {
     return this.indicatorRepository
-      .createQueryBuilder('i')
-      .leftJoin('i.project', 'p')
+      .createQueryBuilder('indicator')
+      .leftJoin('indicator.project', 'project')
       .select([
-        'i.id AS id',
-        'i.name AS name',
-        'i."currentValue"::float AS "currentValue"',
-        'i.threshold::float AS threshold',
-        'p.id AS "projectId"',
-        'p.name AS project',
+        'indicator.id AS id',
+        'indicator.name AS name',
+        'indicator."currentValue"::float AS "currentValue"',
+        'indicator.threshold::float AS threshold',
+        'project.id AS "projectId"',
+        'project.name AS project',
       ])
-      .where('i."currentValue" < i.threshold')
-      .orderBy('i."currentValue" - i.threshold', 'ASC')
+      .where('indicator."currentValue" < indicator.threshold')
+      .orderBy('indicator."currentValue" - indicator.threshold', 'ASC')
       .getRawMany<CriticalIndicatorRow>();
   }
 }
