@@ -20,7 +20,7 @@ export class Project extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 200 })
+  @Column({ length: 200, unique: true })
   @Index()
   name: string;
 
