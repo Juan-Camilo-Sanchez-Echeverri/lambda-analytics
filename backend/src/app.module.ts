@@ -6,7 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { PostgresConfigService } from '@configs';
 
-import { HttpExceptionFilter } from '@common/filters';
+import { HttpExceptionFilter, TypeOrmExceptionFilter } from '@common/filters';
 
 import { ProjectsModule } from '@modules/projects/projects.module';
 import { ActivitiesModule } from '@modules/activities/activities.module';
@@ -27,6 +27,9 @@ import { AuthModule } from '@modules/auth/auth.module';
     UsersModule,
     AuthModule,
   ],
-  providers: [{ provide: APP_FILTER, useClass: HttpExceptionFilter }],
+  providers: [
+    { provide: APP_FILTER, useClass: HttpExceptionFilter },
+    { provide: APP_FILTER, useClass: TypeOrmExceptionFilter },
+  ],
 })
 export class AppModule {}
