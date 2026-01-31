@@ -19,8 +19,8 @@ export interface Project {
   endDate: string | null;
   progress: number;
   performance: number;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Indicator {

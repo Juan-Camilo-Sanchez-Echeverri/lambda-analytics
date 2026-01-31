@@ -105,13 +105,13 @@ export function ProjectsTable({
                     </span>
                   </td>
                   <td className="px-4 py-2">
-                    {typeof p.progress === 'number' ? `${p.progress}%` : '—'}
+                    {`${p.progress}%`}
                   </td>
                   <td className="px-4 py-2">
-                    {typeof p.performance === 'number' ? `${p.performance}%` : '—'}
+                    {`${p.performance}%`}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600">
-                    {p.updatedAt ? new Date(p.updatedAt).toLocaleString() : '—'}
+                    {new Date(p.updatedAt).toLocaleString() }
                   </td>
                 </tr>
               ))}
