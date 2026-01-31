@@ -144,7 +144,7 @@ export function useProjects(
     (query: string, newStatus?: ProjectStatus | 'all') => {
       setQ(query);
       if (newStatus !== undefined) setStatus(newStatus);
-      setPage(1); // Volver a la primera página
+      setPage(1);
     },
     [],
   );
